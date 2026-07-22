@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — V.K. Express</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #2d1b1b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 30% 50%, rgba(192,57,43,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .login-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      width: 420px;
+      max-width: 95vw;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .login-logo { margin-bottom: 0.5rem; }
+    .login-logo img { height: 70px; width: 70px; object-fit: contain; border-radius: 10px; margin: 0 auto; }
+    .login-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: #fff;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+    .login-sub { color: rgba(255,255,255,0.4); font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2.5rem; }
+    .login-title { color: #fff; font-size: 1.1rem; font-weight: 600; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .form-field { margin-bottom: 1.2rem; text-align: left; }
+    .form-field label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.4rem; }
+    .form-field input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 0.85rem 1.1rem;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-field input:focus { outline: none; border-color: #C0392B; background: rgba(255,255,255,0.12); }
+    .form-field input::placeholder { color: rgba(255,255,255,0.3); }
+    .btn-login {
+      width: 100%;
+      background: #C0392B;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.95rem;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+      margin-top: 0.5rem;
+    }
+    .btn-login:hover { background: #96281b; transform: translateY(-1px); }
+    .error-msg { color: #e74c3c; font-size: 0.88rem; margin-top: 1rem; display: none; }
+    .back-link { display: block; margin-top: 1.5rem; color: rgba(255,255,255,0.4); font-size: 0.82rem; }
+    .back-link a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    .back-link a:hover { color: #C0392B; }
+    .demo-hint { margin-top: 1.25rem; background: rgba(255,255,255,0.06); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:70px;width:auto;">
+    </div>
+    <div class="login-brand">V.K. Express</div>
+    <div class="login-sub">Courier & Cargo Management</div>
+    <div class="login-title">🔐 Admin Panel Login</div>
+
+    <div class="form-field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Enter username">
+    </div>
+    <div class="form-field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Login to Admin Panel</button>
+    <div class="error-msg" id="errorMsg">❌ Invalid username or password.</div>
+    <div class="demo-hint">Demo credentials: <strong style="color:rgba(255,255,255,0.7)">vkadmin</strong> / <strong style="color:rgba(255,255,255,0.7)">adminvk</strong></div>
+    <div class="back-link">← <a href="../index.html">Back to Website</a></div>
+  </div>
+
+  <script>
+    // Check already logged in
+    if (localStorage.getItem('vkadmin_logged_in') === 'true') {
+      window.location.href = 'dashboard.html';
+    }
+
+    function doLogin() {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      // Stored in localStorage (changeable from admin)
+      const savedUser = localStorage.getItem('vkadmin_username') || 'vkadmin';
+      const savedPass = localStorage.getItem('vkadmin_password') || 'adminvk';
+      if (u === savedUser && p === savedPass) {
+        localStorage.setItem('vkadmin_logged_in', 'true');
+        window.location.href = 'dashboard.html';
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

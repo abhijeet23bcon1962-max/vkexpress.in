@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — VK Express Admin</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:40px;width:auto;">
+    <div class="sidebar-logo-text">
+      <strong>V.K. EXPRESS</strong>
+      <span>Admin Panel</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
+    <div class="nav-section-label">Consignments</div>
+    <a href="consignments.html" class="sidebar-link"><span class="icon">📦</span> All Consignments</a>
+    <a href="consignments.html?action=add" class="sidebar-link"><span class="icon">➕</span> Add Consignment</a>
+    <div class="nav-section-label">Management</div>
+    <a href="branches.html" class="sidebar-link"><span class="icon">🏢</span> Branches</a>
+    <a href="settings.html" class="sidebar-link"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-logout" onclick="doLogout()">
+      <span>🚪</span> Logout
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-area">
+  <header class="admin-header">
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <button class="btn btn-ghost btn-sm" onclick="toggleSidebar()" style="display:none;" id="menuBtn">☰</button>
+      <div class="admin-header-title">Dashboard</div>
+    </div>
+    <div class="admin-header-right">
+      <a href="../index.html" class="back-site-btn">← View Website</a>
+      <div class="admin-user">
+        <div class="user-avatar" id="userAvatar">VK</div>
+        <span id="userNameDisplay">vkadmin</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <!-- Stat Cards -->
+    <div class="stat-cards" id="statCards">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Consignments</div>
+        <div class="stat-card-num" id="statTotal">—</div>
+        <div class="stat-card-sub">All time records</div>
+      </div>
+      <div class="stat-card" data-color="green">
+        <div class="stat-card-label">Delivered</div>
+        <div class="stat-card-num" id="statDelivered">—</div>
+        <div class="stat-card-sub">Successfully delivered</div>
+      </div>
+      <div class="stat-card" data-color="yellow">
+        <div class="stat-card-label">In Transit</div>
+        <div class="stat-card-num" id="statTransit">—</div>
+        <div class="stat-card-sub">Currently en route</div>
+      </div>
+      <div class="stat-card" data-color="blue">
+        <div class="stat-card-label">Branches</div>
+        <div class="stat-card-num" id="statBranches">—</div>
+        <div class="stat-card-sub">Active offices</div>
+      </div>
+    </div>
+
+    <!-- Recent Consignments Table -->
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">Recent Consignments</div>
+        <a href="consignments.html" class="btn btn-outline btn-sm">View All</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="recentTable">
+          <thead>
+            <tr>
+              <th>AWB No.</th>
+              <th>Date</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Consignee</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recentTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="content-card">
+      <div class="card-header"><div class="card-title">Quick Actions</div></div>
+      <div class="card-body" style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="consignments.html?action=add" class="btn btn-primary">➕ Add New Consignment</a>
+        <a href="consignments.html" class="btn btn-outline">📦 Manage Consignments</a>
+        <a href="branches.html" class="btn btn-outline">🏢 Manage Branches</a>
+        <a href="../track.html" target="_blank" class="btn btn-outline">🔍 Track Shipment</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../data.js"></script>
+<script src="admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  requireLogin();
+  loadDashboard();
+});
+
+function loadDashboard() {
+  const consignments = getConsignments();
+  const branches = getBranches();
+
+  document.getElementById('statTotal').textContent = consignments.length;
+  document.getElementById('statDelivered').textContent = consignments.filter(c => c.status === 'Delivered').length;
+  document.getElementById('statTransit').textContent = consignments.filter(c => c.status === 'In Transit').length;
+  document.getElementById('statBranches').textContent = branches.filter(b => b.status === 1).length;
+
+  const recent = [...consignments].reverse().slice(0, 10);
+  const tbody = document.getElementById('recentTbody');
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:#999;">No consignments found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(c => `
+    <tr>
+      <td><strong>${c.awb}</strong></td>
+      <td>${c.date}</td>
+      <td>${c.origin}</td>
+      <td>${c.destination}</td>
+      <td>${c.consignee || '—'}</td>
+      <td>${c.type}</td>
+      <td><span class="badge ${badgeClass(c.status)}">${c.status}</span></td>
+      <td>
+        <a href="consignments.html?edit=${c.id}" class="btn btn-outline btn-sm">Edit</a>
+        <button class="btn btn-danger btn-sm" onclick="deleteConsignment(${c.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteConsignment(id) {
+  if (!confirm('Delete this consignment?')) return;
+  let data = getConsignments().filter(c => c.id !== id);
+  saveConsignments(data);
+  loadDashboard();
+  showToast('Consignment deleted.', 'success');
+}
+</script>
+</body>
+</html>

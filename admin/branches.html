@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branches — VK Express Admin</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:40px;width:auto;"><div class="sidebar-logo-text"><strong>V.K. EXPRESS</strong><span>Admin Panel</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+    <div class="nav-section-label">Consignments</div>
+    <a href="consignments.html" class="sidebar-link"><span class="icon">📦</span> All Consignments</a>
+    <a href="consignments.html?action=add" class="sidebar-link"><span class="icon">➕</span> Add Consignment</a>
+    <div class="nav-section-label">Management</div>
+    <a href="branches.html" class="sidebar-link active"><span class="icon">🏢</span> Branches</a>
+    <a href="settings.html" class="sidebar-link"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="sidebar-logout" onclick="doLogout()"><span>🚪</span> Logout</div></div>
+</aside>
+
+<div class="main-area">
+  <header class="admin-header">
+    <div class="admin-header-title">Branch Management</div>
+    <div class="admin-header-right">
+      <a href="../index.html" class="back-site-btn">← View Website</a>
+      <div class="admin-user"><div class="user-avatar" id="userAvatar">VK</div><span id="userNameDisplay">vkadmin</span></div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">All Branches</div>
+        <button class="btn btn-primary" onclick="openBranchModal()">➕ Add Branch</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>City</th><th>Address</th><th>Mobile</th><th>Phone</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="branchTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="branchModal">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title" id="branchModalTitle">Add Branch</div>
+      <button class="modal-close" onclick="closeBranchModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field-group full"><label>City Name *</label><input type="text" id="bCity" placeholder="e.g. Jaipur"></div>
+        <div class="form-field-group full"><label>Address *</label><input type="text" id="bAddress" placeholder="Full address"></div>
+        <div class="form-field-group"><label>Mobile</label><input type="text" id="bMobile" placeholder="Mobile number"></div>
+        <div class="form-field-group"><label>Phone</label><input type="text" id="bPhone" placeholder="Phone number"></div>
+        <div class="form-field-group full"><label>Email</label><input type="email" id="bMail" placeholder="branch@vkexpress.in"></div>
+        <div class="form-field-group"><label>Status</label><select id="bStatus"><option value="1">Active</option><option value="0">Inactive</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeBranchModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBranch()">💾 Save Branch</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../data.js"></script>
+<script src="admin.js"></script>
+<script>
+let editBranchId = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  requireLogin();
+  renderBranches();
+});
+
+function renderBranches() {
+  const data = getBranches();
+  const tbody = document.getElementById('branchTbody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🏢</div><p>No branches yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map((b, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${b.city}</strong></td>
+      <td style="max-width:220px; font-size:0.84rem;">${b.address}</td>
+      <td>${b.mobile}</td>
+      <td>${b.phone}</td>
+      <td style="font-size:0.82rem;"><a href="mailto:${b.mail}" style="color:var(--red);">${b.mail}</a></td>
+      <td><span class="badge ${b.status == 1 ? 'badge-delivered' : 'badge-pending'}">${b.status == 1 ? 'Active' : 'Inactive'}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-outline btn-sm" onclick="editBranch(${b.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="delBranch(${b.id})">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openBranchModal(id = null) {
+  editBranchId = id;
+  document.getElementById('branchModal').classList.add('open');
+  document.getElementById('branchModalTitle').textContent = id ? 'Edit Branch' : 'Add Branch';
+  if (!id) {
+    ['bCity','bAddress','bMobile','bPhone','bMail'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('bStatus').value = '1';
+  }
+}
+
+function editBranch(id) {
+  const b = getBranches().find(x => x.id === id);
+  if (!b) return;
+  editBranchId = id;
+  document.getElementById('branchModal').classList.add('open');
+  document.getElementById('branchModalTitle').textContent = 'Edit Branch';
+  document.getElementById('bCity').value = b.city;
+  document.getElementById('bAddress').value = b.address;
+  document.getElementById('bMobile').value = b.mobile;
+  document.getElementById('bPhone').value = b.phone;
+  document.getElementById('bMail').value = b.mail;
+  document.getElementById('bStatus').value = b.status;
+}
+
+function closeBranchModal() { document.getElementById('branchModal').classList.remove('open'); editBranchId = null; }
+
+function saveBranch() {
+  const city = document.getElementById('bCity').value.trim();
+  const address = document.getElementById('bAddress').value.trim();
+  if (!city || !address) { alert('City and Address are required.'); return; }
+  let data = getBranches();
+  const obj = {
+    city,
+    address,
+    mobile: document.getElementById('bMobile').value.trim(),
+    phone: document.getElementById('bPhone').value.trim(),
+    mail: document.getElementById('bMail').value.trim(),
+    status: parseInt(document.getElementById('bStatus').value),
+  };
+  if (editBranchId) {
+    const idx = data.findIndex(b => b.id === editBranchId);
+    if (idx !== -1) data[idx] = { ...data[idx], ...obj };
+    showToast('Branch updated!', 'success');
+  } else {
+    obj.id = getNextId(data);
+    data.push(obj);
+    showToast('Branch added!', 'success');
+  }
+  saveBranches(data);
+  closeBranchModal();
+  renderBranches();
+}
+
+function delBranch(id) {
+  if (!confirm('Delete this branch?')) return;
+  saveBranches(getBranches().filter(b => b.id !== id));
+  renderBranches();
+  showToast('Branch deleted.', 'error');
+}
+</script>
+</body>
+</html>

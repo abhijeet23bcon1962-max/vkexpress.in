@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — VK Express Admin</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:40px;width:auto;"><div class="sidebar-logo-text"><strong>V.K. EXPRESS</strong><span>Admin Panel</span></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+    <div class="nav-section-label">Consignments</div>
+    <a href="consignments.html" class="sidebar-link"><span class="icon">📦</span> All Consignments</a>
+    <a href="consignments.html?action=add" class="sidebar-link"><span class="icon">➕</span> Add Consignment</a>
+    <div class="nav-section-label">Management</div>
+    <a href="branches.html" class="sidebar-link"><span class="icon">🏢</span> Branches</a>
+    <a href="settings.html" class="sidebar-link active"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="sidebar-logout" onclick="doLogout()"><span>🚪</span> Logout</div></div>
+</aside>
+
+<div class="main-area">
+  <header class="admin-header">
+    <div class="admin-header-title">Settings</div>
+    <div class="admin-header-right">
+      <a href="../index.html" class="back-site-btn">← View Website</a>
+      <div class="admin-user"><div class="user-avatar" id="userAvatar">VK</div><span id="userNameDisplay">vkadmin</span></div>
+    </div>
+  </header>
+
+  <div class="page-content" style="max-width:680px;">
+
+    <div class="content-card" style="margin-bottom:1.5rem;">
+      <div class="card-header"><div class="card-title">🔐 Change Admin Password</div></div>
+      <div class="card-body">
+        <div id="pwSuccess" style="display:none; background:#d4edda; color:#155724; border-radius:8px; padding:0.85rem 1rem; margin-bottom:1rem; font-size:0.9rem;">✅ Password changed successfully!</div>
+        <div class="form-grid" style="gap:1rem;">
+          <div class="form-field-group">
+            <label>New Username</label>
+            <input type="text" id="newUser" placeholder="New username">
+          </div>
+          <div class="form-field-group">
+            <label>New Password</label>
+            <input type="password" id="newPass" placeholder="New password">
+          </div>
+          <div class="form-field-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confPass" placeholder="Confirm password">
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;">
+          <button class="btn btn-primary" onclick="changePassword()">Save Credentials</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card" style="margin-bottom:1.5rem;">
+      <div class="card-header"><div class="card-title">💾 Data Management</div></div>
+      <div class="card-body">
+        <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:1.25rem;">All data is stored in your browser's localStorage. You can export or reset it below.</p>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="exportData()">📤 Export Data (JSON)</button>
+          <button class="btn btn-danger" onclick="resetData()">🗑️ Reset All Data</button>
+        </div>
+        <div id="exportArea" style="display:none; margin-top:1rem;">
+          <textarea id="exportJson" style="width:100%; height:180px; border:1.5px solid var(--border); border-radius:8px; padding:0.75rem; font-family:monospace; font-size:0.78rem; resize:vertical;" readonly></textarea>
+          <button class="btn btn-outline btn-sm" style="margin-top:0.5rem;" onclick="copyExport()">📋 Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="card-header"><div class="card-title">ℹ️ About</div></div>
+      <div class="card-body">
+        <div style="font-size:0.9rem; color:var(--text-light); line-height:1.8;">
+          <p><strong style="color:var(--text);">V.K. Express Admin Panel</strong></p>
+          <p>Version: 2.0 | Frontend-only system using localStorage</p>
+          <p>Head Office: 114, Amer Chamber Jalori Gate, Olympic Road, Jodhpur</p>
+          <p>GST: 08AHGPK1597H1Z3</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../data.js"></script>
+<script src="admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { requireLogin(); });
+
+function changePassword() {
+  const u = document.getElementById('newUser').value.trim();
+  const p = document.getElementById('newPass').value;
+  const c = document.getElementById('confPass').value;
+  if (!u || !p) { alert('Username and password cannot be empty.'); return; }
+  if (p !== c) { alert('Passwords do not match.'); return; }
+  localStorage.setItem('vkadmin_username', u);
+  localStorage.setItem('vkadmin_password', p);
+  document.getElementById('pwSuccess').style.display = 'block';
+  document.getElementById('newUser').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('confPass').value = '';
+  setTimeout(() => document.getElementById('pwSuccess').style.display = 'none', 4000);
+}
+
+function exportData() {
+  const data = {
+    consignments: getConsignments(),
+    branches: getBranches(),
+    exported: new Date().toISOString()
+  };
+  document.getElementById('exportArea').style.display = 'block';
+  document.getElementById('exportJson').value = JSON.stringify(data, null, 2);
+}
+
+function copyExport() {
+  const ta = document.getElementById('exportJson');
+  ta.select();
+  document.execCommand('copy');
+  showToast('Copied to clipboard!', 'success');
+}
+
+function resetData() {
+  if (!confirm('WARNING: This will delete ALL consignments and branches data. Are you sure?')) return;
+  if (!confirm('Last chance — this cannot be undone. Confirm reset?')) return;
+  localStorage.removeItem('vkexpress_consignments');
+  localStorage.removeItem('vkexpress_branches');
+  showToast('All data has been reset.', 'error');
+  setTimeout(() => window.location.href = 'dashboard.html', 1500);
+}
+</script>
+</body>
+</html>

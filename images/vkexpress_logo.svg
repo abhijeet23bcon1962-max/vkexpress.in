@@ -1,0 +1,74 @@
+<svg width="400" height="200" viewBox="0 0 680 340" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>V.K. Express Logo</title>
+  <desc>Modern logo for V.K. Express Courier and Cargo featuring a bold red shield emblem with speed lines and stylized typography</desc>
+
+  <defs>
+    <clipPath id="shieldClip">
+      <path d="M340 40 L408 68 L408 160 Q408 220 340 255 Q272 220 272 160 L272 68 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background transparent -->
+  <rect width="680" height="340" fill="transparent"/>
+
+  <!-- SHIELD BODY -->
+  <path d="M340 40 L408 68 L408 160 Q408 220 340 255 Q272 220 272 160 L272 68 Z"
+        fill="#C0392B"/>
+
+  <!-- Shield inner border -->
+  <path d="M340 52 L398 76 L398 158 Q398 210 340 242 Q282 210 282 158 L282 76 Z"
+        fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+
+  <!-- Speed lines inside shield -->
+  <g clip-path="url(#shieldClip)" opacity="0.15">
+    <line x1="272" y1="110" x2="408" y2="80"  stroke="white" stroke-width="8"/>
+    <line x1="272" y1="135" x2="408" y2="105" stroke="white" stroke-width="8"/>
+    <line x1="272" y1="160" x2="408" y2="130" stroke="white" stroke-width="8"/>
+    <line x1="272" y1="185" x2="408" y2="155" stroke="white" stroke-width="8"/>
+    <line x1="272" y1="210" x2="408" y2="180" stroke="white" stroke-width="8"/>
+  </g>
+
+  <!-- VK Letters -->
+  <text x="340" y="175" text-anchor="middle"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900" font-size="68" fill="white"
+        letter-spacing="-3">VK</text>
+
+  <!-- Shield bottom accent -->
+  <ellipse cx="340" cy="255" rx="14" ry="5" fill="#96281b"/>
+
+  <!-- Speed lines left -->
+  <line x1="220" y1="128" x2="258" y2="132" stroke="#C0392B" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <line x1="205" y1="147" x2="258" y2="148" stroke="#C0392B" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="218" y1="166" x2="258" y2="164" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Speed lines right -->
+  <line x1="422" y1="128" x2="460" y2="132" stroke="#C0392B" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <line x1="422" y1="147" x2="475" y2="148" stroke="#C0392B" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="422" y1="166" x2="462" y2="164" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Company Name -->
+  <text x="340" y="294"
+        text-anchor="middle"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900"
+        font-size="36"
+        letter-spacing="8"
+        fill="#1a1a2e">V.K. EXPRESS</text>
+
+  <!-- Divider lines -->
+  <line x1="160" y1="310" x2="258" y2="310" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="422" y1="310" x2="520" y2="310" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Tagline -->
+  <text x="340" y="316"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-weight="400"
+        font-size="12"
+        letter-spacing="5"
+        fill="#666666">COURIER  &amp;  CARGO</text>
+
+  <!-- Top dot accent -->
+  <circle cx="340" cy="55" r="4" fill="white" opacity="0.6"/>
+</svg>

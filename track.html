@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Shipment — V.K. Express</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="slideshow.css">
+</head>
+<body>
+<div class="topbar"><div class="container topbar-inner"><div class="topbar-left"><span>📞 0291-2613165</span><span>📱 9314726460 / 9057576770</span><span>✉ info@vkexpress.in</span></div></div></div>
+<header class="site-header"><div class="container header-inner"><a href="index.html" class="logo-wrap"><img src="master_page_img/Logo.png" alt="VK Express Logo" class="logo-img"></a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button><nav class="main-nav" id="mainNav"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About Us</a><a href="services.html" class="nav-link">Services</a><a href="track.html" class="nav-link active">Track</a><a href="branches.html" class="nav-link">Branches</a><a href="contact.html" class="nav-link">Contact</a><a href="admin/index.html" class="nav-link nav-admin">LOGIN</a></nav></div></header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>Track Your Shipment</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a> / Track</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="track-page-box">
+      <div class="track-page-form">
+        <h2>Shipment Tracking</h2>
+        <p>Enter your AWB number or tracking number to get real-time status of your shipment.</p>
+        <div class="track-form-row">
+          <input type="text" id="trackInputPage" placeholder="e.g. 112112 or 11727272">
+          <button onclick="trackShipmentPage()">Track Now</button>
+        </div>
+      </div>
+      <div id="trackResultPage" style="display:none;"></div>
+
+      <div style="margin-top:3rem; background:var(--light); border-radius:var(--radius-lg); padding:2rem;">
+        <h3 style="font-family:'Barlow Condensed',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:1rem;">Need Help?</h3>
+        <p style="color:var(--text-light); font-size:0.9rem;">Can't find your shipment? Contact our team:</p>
+        <div style="margin-top:1rem; display:flex; gap:2rem; flex-wrap:wrap;">
+          <div><strong>Phone:</strong> 0291-2613165</div>
+          <div><strong>Mobile:</strong> 9314726460</div>
+          <div><strong>Email:</strong> info@vkexpress.in</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <img src="master_page_img/Logo.png" alt="VK Express" style="height:72px;width:auto;margin-bottom:0.5rem;">
+      <p>Courier &amp; Cargo Services<br>Jodhpur, Rajasthan, India</p>
+      <p style="margin-top:1rem; font-size:0.82rem; color:#666;">GST: 08AHGPK1597H1Z3</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn fb">f</a>
+        <a href="#" class="social-btn tw">t</a>
+        <a href="#" class="social-btn gm">@</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h5>Quick Links</h5>
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="services.html">Services</a>
+      <a href="track.html">Track Shipment</a>
+      <a href="branches.html">Branches</a>
+      <a href="contact.html">Contact Us</a>
+    </div>
+    <div class="footer-links">
+      <h5>Services</h5>
+      <a href="services.html">International Courier</a>
+      <a href="services.html">Domestic Cargo</a>
+      <a href="services.html">Same Day Delivery</a>
+      <a href="services.html">Food Express</a>
+      <a href="services.html">Corporate Logistics</a>
+      <a href="services.html">Local Courier</a>
+    </div>
+    <div class="footer-contact">
+      <h5>Get In Touch</h5>
+      <p>114, Amer Chamber Jalori Gate<br>Olympic Road, Jodhpur<br>Rajasthan 342001, India</p>
+      <p style="margin-top:0.75rem;">📞 0291-2613165</p>
+      <p>📱 9314726460</p>
+      <p>✉ info@vkexpress.in</p>
+      <a href="track.html" class="footer-track-btn">Track Shipment →</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>© 2025 V.K. Express Courier &amp; Cargo. All Rights Reserved.</p>
+      <p>Designed with ❤ in Jodhpur, Rajasthan</p>
+    </div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

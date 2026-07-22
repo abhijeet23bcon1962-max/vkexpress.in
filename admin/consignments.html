@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consignments — VK Express Admin</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:40px;width:auto;">
+    <div class="sidebar-logo-text"><strong>V.K. EXPRESS</strong><span>Admin Panel</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+    <div class="nav-section-label">Consignments</div>
+    <a href="consignments.html" class="sidebar-link active"><span class="icon">📦</span> All Consignments</a>
+    <a href="#" class="sidebar-link" onclick="openModal()"><span class="icon">➕</span> Add Consignment</a>
+    <div class="nav-section-label">Management</div>
+    <a href="branches.html" class="sidebar-link"><span class="icon">🏢</span> Branches</a>
+    <a href="settings.html" class="sidebar-link"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="sidebar-logout" onclick="doLogout()"><span>🚪</span> Logout</div></div>
+</aside>
+
+<div class="main-area">
+  <header class="admin-header">
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <div class="admin-header-title">Consignments</div>
+    </div>
+    <div class="admin-header-right">
+      <a href="../index.html" class="back-site-btn">← View Website</a>
+      <div class="admin-user">
+        <div class="user-avatar" id="userAvatar">VK</div>
+        <span id="userNameDisplay">vkadmin</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-content">
+
+    <!-- Stats Row -->
+    <div class="stat-cards" style="grid-template-columns: repeat(4,1fr); margin-bottom:1.5rem;">
+      <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-num" id="sTotal">0</div></div>
+      <div class="stat-card" data-color="green"><div class="stat-card-label">Delivered</div><div class="stat-card-num" id="sDelivered">0</div></div>
+      <div class="stat-card" data-color="yellow"><div class="stat-card-label">In Transit</div><div class="stat-card-num" id="sTransit">0</div></div>
+      <div class="stat-card" data-color="blue"><div class="stat-card-label">Other</div><div class="stat-card-num" id="sOther">0</div></div>
+    </div>
+
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">All Consignments</div>
+        <button class="btn btn-primary" onclick="openModal()">➕ Add New</button>
+      </div>
+      <div class="card-body" style="padding-bottom:0.5rem;">
+        <div class="filter-bar" style="margin-bottom:1rem;">
+          <input type="text" id="searchInput" placeholder="🔍 Search AWB, consignee, origin..." oninput="renderTable()">
+          <select id="statusFilter" onchange="renderTable()">
+            <option value="">All Statuses</option>
+            <option value="Delivered">Delivered</option>
+            <option value="In Transit">In Transit</option>
+            <option value="Booked">Booked</option>
+            <option value="Pending">Pending</option>
+          </select>
+          <select id="typeFilter" onchange="renderTable()">
+            <option value="">All Types</option>
+            <option value="Domestic">Domestic</option>
+            <option value="International">International</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>AWB No.</th>
+              <th>Tracking No.</th>
+              <th>Date</th>
+              <th>Origin → Destination</th>
+              <th>Consignor</th>
+              <th>Consignee</th>
+              <th>Type</th>
+              <th>Weight</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="mainTbody"></tbody>
+        </table>
+      </div>
+      <div class="card-body" style="padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+        <div class="page-info" id="pageInfo"></div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Add New Consignment</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="form-section-title">📦 Shipment Information</div>
+
+        <div class="form-field-group">
+          <label>AWB Number *</label>
+          <input type="text" id="fAwb" placeholder="e.g. 112112">
+        </div>
+        <div class="form-field-group">
+          <label>Tracking Number</label>
+          <input type="text" id="fTracking" placeholder="e.g. 443244160235">
+        </div>
+        <div class="form-field-group">
+          <label>Booking Date *</label>
+          <input type="date" id="fDate">
+        </div>
+        <div class="form-field-group">
+          <label>Service Type</label>
+          <select id="fType">
+            <option value="Domestic">Domestic</option>
+            <option value="International">International</option>
+          </select>
+        </div>
+        <div class="form-field-group">
+          <label>Origin *</label>
+          <input type="text" id="fOrigin" placeholder="e.g. Jodhpur">
+        </div>
+        <div class="form-field-group">
+          <label>Destination *</label>
+          <input type="text" id="fDestination" placeholder="e.g. Delhi">
+        </div>
+        <div class="form-field-group">
+          <label>Weight (kg)</label>
+          <input type="text" id="fWeight" placeholder="e.g. 2.5">
+        </div>
+        <div class="form-field-group">
+          <label>Payment Mode</label>
+          <select id="fPayment">
+            <option value="Prepaid">Prepaid</option>
+            <option value="To-Pay">To-Pay</option>
+            <option value="COD">COD</option>
+          </select>
+        </div>
+        <div class="form-field-group">
+          <label>Forwarder</label>
+          <input type="text" id="fForwarder" placeholder="e.g. FedEx, DHL, Surface">
+        </div>
+        <div class="form-field-group">
+          <label>Branch</label>
+          <input type="text" id="fBranch" placeholder="e.g. Jodhpur">
+        </div>
+
+        <div class="form-section-title">👤 Consignor Details</div>
+        <div class="form-field-group">
+          <label>Consignor Name</label>
+          <input type="text" id="fConsignor" placeholder="Sender name">
+        </div>
+        <div class="form-field-group">
+          <label>Consignor Mobile</label>
+          <input type="text" id="fConsignorMobile" placeholder="Sender phone">
+        </div>
+
+        <div class="form-section-title">📬 Consignee Details</div>
+        <div class="form-field-group">
+          <label>Consignee Name</label>
+          <input type="text" id="fConsignee" placeholder="Receiver name">
+        </div>
+        <div class="form-field-group">
+          <label>Consignee Mobile</label>
+          <input type="text" id="fConsigneeMobile" placeholder="Receiver phone">
+        </div>
+        <div class="form-field-group full">
+          <label>Consignee Address</label>
+          <input type="text" id="fConsigneeAddress" placeholder="Full delivery address">
+        </div>
+
+        <div class="form-section-title">🚚 Delivery Status</div>
+        <div class="form-field-group">
+          <label>Current Status *</label>
+          <select id="fStatus">
+            <option value="Booked">Booked</option>
+            <option value="In Transit">In Transit</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Pending">Pending</option>
+            <option value="Returned">Returned</option>
+          </select>
+        </div>
+        <div class="form-field-group">
+          <label>Delivered Date</label>
+          <input type="date" id="fDeliveredDate">
+        </div>
+        <div class="form-field-group">
+          <label>Delivered To (Name)</label>
+          <input type="text" id="fDeliveredTo" placeholder="Person who received">
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveConsignment()">💾 Save Consignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../data.js"></script>
+<script src="admin.js"></script>
+<script>
+let currentPage = 1;
+const perPage = 15;
+let editingId = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  requireLogin();
+  // Check URL param for auto-open add modal
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('action') === 'add') openModal();
+  if (params.get('edit')) openEdit(parseInt(params.get('edit')));
+  renderTable();
+  updateStats();
+});
+
+function updateStats() {
+  const data = getConsignments();
+  document.getElementById('sTotal').textContent = data.length;
+  document.getElementById('sDelivered').textContent = data.filter(c => c.status === 'Delivered').length;
+  document.getElementById('sTransit').textContent = data.filter(c => c.status === 'In Transit').length;
+  document.getElementById('sOther').textContent = data.filter(c => c.status !== 'Delivered' && c.status !== 'In Transit').length;
+}
+
+function getFiltered() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  return getConsignments().filter(c => {
+    const matchSearch = !search ||
+      (c.awb && c.awb.toLowerCase().includes(search)) ||
+      (c.trackingNo && c.trackingNo.toLowerCase().includes(search)) ||
+      (c.consignee && c.consignee.toLowerCase().includes(search)) ||
+      (c.consignor && c.consignor.toLowerCase().includes(search)) ||
+      (c.origin && c.origin.toLowerCase().includes(search)) ||
+      (c.destination && c.destination.toLowerCase().includes(search));
+    const matchStatus = !status || c.status === status;
+    const matchType = !type || c.type === type;
+    return matchSearch && matchStatus && matchType;
+  });
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  if (currentPage > totalPages) currentPage = 1;
+
+  const slice = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
+  const tbody = document.getElementById('mainTbody');
+
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">📭</div><p>No consignments found.</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map((c, i) => `
+      <tr>
+        <td style="color:var(--text-light); font-size:0.8rem;">${(currentPage-1)*perPage + i + 1}</td>
+        <td><strong>${c.awb}</strong></td>
+        <td style="font-size:0.82rem; color:var(--text-light);">${c.trackingNo || '—'}</td>
+        <td>${c.date}</td>
+        <td><strong>${c.origin}</strong> → ${c.destination}</td>
+        <td>${c.consignor || '—'}</td>
+        <td>${c.consignee || '—'}</td>
+        <td><span style="font-size:0.78rem; background:var(--body-bg); padding:0.2rem 0.5rem; border-radius:4px;">${c.type}</span></td>
+        <td>${c.weight ? c.weight + ' kg' : '—'}</td>
+        <td><span class="badge ${badgeClass(c.status)}">${c.status}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-outline btn-sm" onclick="openEdit(${c.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delItem(${c.id})">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Pagination
+  document.getElementById('pageInfo').textContent = `Showing ${Math.min((currentPage-1)*perPage+1, total)}–${Math.min(currentPage*perPage, total)} of ${total}`;
+  const pg = document.getElementById('pagination');
+  pg.innerHTML = '';
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+    btn.textContent = p;
+    btn.onclick = () => { currentPage = p; renderTable(); };
+    pg.appendChild(btn);
+  }
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('typeFilter').value = '';
+  currentPage = 1;
+  renderTable();
+}
+
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modalTitle').textContent = id ? 'Edit Consignment' : 'Add New Consignment';
+  if (!id) {
+    clearForm();
+    document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function openEdit(id) {
+  const c = getConsignments().find(x => x.id === id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modalTitle').textContent = 'Edit Consignment';
+  document.getElementById('fAwb').value = c.awb || '';
+  document.getElementById('fTracking').value = c.trackingNo || '';
+  document.getElementById('fDate').value = c.date || '';
+  document.getElementById('fType').value = c.type || 'Domestic';
+  document.getElementById('fOrigin').value = c.origin || '';
+  document.getElementById('fDestination').value = c.destination || '';
+  document.getElementById('fWeight').value = c.weight || '';
+  document.getElementById('fPayment').value = c.paymentMode || 'Prepaid';
+  document.getElementById('fForwarder').value = c.forwarder || '';
+  document.getElementById('fBranch').value = c.branch || '';
+  document.getElementById('fConsignor').value = c.consignor || '';
+  document.getElementById('fConsignorMobile').value = c.consignorMobile || '';
+  document.getElementById('fConsignee').value = c.consignee || '';
+  document.getElementById('fConsigneeMobile').value = c.consigneeMobile || '';
+  document.getElementById('fConsigneeAddress').value = c.consigneeAddress || '';
+  document.getElementById('fStatus').value = c.status || 'Booked';
+  document.getElementById('fDeliveredDate').value = c.deliveredDate || '';
+  document.getElementById('fDeliveredTo').value = c.deliveredTo || '';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+function clearForm() {
+  ['fAwb','fTracking','fDate','fOrigin','fDestination','fWeight','fForwarder','fBranch','fConsignor','fConsignorMobile','fConsignee','fConsigneeMobile','fConsigneeAddress','fDeliveredDate','fDeliveredTo'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fType').value = 'Domestic';
+  document.getElementById('fPayment').value = 'Prepaid';
+  document.getElementById('fStatus').value = 'Booked';
+}
+
+function saveConsignment() {
+  const awb = document.getElementById('fAwb').value.trim();
+  const date = document.getElementById('fDate').value.trim();
+  const origin = document.getElementById('fOrigin').value.trim();
+  const destination = document.getElementById('fDestination').value.trim();
+  if (!awb || !date || !origin || !destination) {
+    alert('Please fill required fields: AWB Number, Date, Origin, Destination.');
+    return;
+  }
+  let data = getConsignments();
+  const obj = {
+    awb,
+    trackingNo: document.getElementById('fTracking').value.trim(),
+    date,
+    type: document.getElementById('fType').value,
+    origin,
+    destination,
+    weight: document.getElementById('fWeight').value.trim(),
+    paymentMode: document.getElementById('fPayment').value,
+    forwarder: document.getElementById('fForwarder').value.trim(),
+    branch: document.getElementById('fBranch').value.trim(),
+    consignor: document.getElementById('fConsignor').value.trim(),
+    consignorMobile: document.getElementById('fConsignorMobile').value.trim(),
+    consignee: document.getElementById('fConsignee').value.trim(),
+    consigneeMobile: document.getElementById('fConsigneeMobile').value.trim(),
+    consigneeAddress: document.getElementById('fConsigneeAddress').value.trim(),
+    status: document.getElementById('fStatus').value,
+    deliveredDate: document.getElementById('fDeliveredDate').value,
+    deliveredTo: document.getElementById('fDeliveredTo').value.trim(),
+  };
+
+  if (editingId) {
+    const idx = data.findIndex(c => c.id === editingId);
+    if (idx !== -1) { data[idx] = { ...data[idx], ...obj }; }
+    showToast('✅ Consignment updated!', 'success');
+  } else {
+    obj.id = getNextId(data);
+    data.push(obj);
+    showToast('✅ Consignment added!', 'success');
+  }
+
+  saveConsignments(data);
+  closeModal();
+  renderTable();
+  updateStats();
+}
+
+function delItem(id) {
+  if (!confirm('Delete this consignment? This cannot be undone.')) return;
+  saveConsignments(getConsignments().filter(c => c.id !== id));
+  renderTable();
+  updateStats();
+  showToast('Consignment deleted.', 'error');
+}
+</script>
+</body>
+</html>
