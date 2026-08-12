@@ -12,7 +12,7 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:40px;width:auto;">
+    <img src="../images/vkexpress_logo.svg" alt="VK Express" style="height:36px;width:auto;">
     <div class="sidebar-logo-text"><strong>V.K. EXPRESS</strong><span>Admin Panel</span></div>
   </div>
   <nav class="sidebar-nav">
@@ -45,11 +45,12 @@
   <div class="page-content">
 
     <!-- Stats Row -->
-    <div class="stat-cards" style="grid-template-columns: repeat(4,1fr); margin-bottom:1.5rem;">
+    <div class="stat-cards" style="grid-template-columns: repeat(5,1fr); margin-bottom:1.5rem;">
       <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-num" id="sTotal">0</div></div>
       <div class="stat-card" data-color="green"><div class="stat-card-label">Delivered</div><div class="stat-card-num" id="sDelivered">0</div></div>
       <div class="stat-card" data-color="yellow"><div class="stat-card-label">In Transit</div><div class="stat-card-num" id="sTransit">0</div></div>
-      <div class="stat-card" data-color="blue"><div class="stat-card-label">Other</div><div class="stat-card-num" id="sOther">0</div></div>
+      <div class="stat-card" data-color="blue"><div class="stat-card-label">Out for Delivery</div><div class="stat-card-num" id="sOut">0</div></div>
+      <div class="stat-card" data-color="purple"><div class="stat-card-label">Other</div><div class="stat-card-num" id="sOther">0</div></div>
     </div>
 
     <div class="content-card">
@@ -62,10 +63,12 @@
           <input type="text" id="searchInput" placeholder="🔍 Search AWB, consignee, origin..." oninput="renderTable()">
           <select id="statusFilter" onchange="renderTable()">
             <option value="">All Statuses</option>
-            <option value="Delivered">Delivered</option>
-            <option value="In Transit">In Transit</option>
-            <option value="Booked">Booked</option>
-            <option value="Pending">Pending</option>
+            <option value="Booked">📋 Booked</option>
+            <option value="In Transit">🚛 In Transit</option>
+            <option value="Out for Delivery">🏍️ Out for Delivery</option>
+            <option value="Delivered">✅ Delivered</option>
+            <option value="Pending">⏳ Pending</option>
+            <option value="Returned">↩️ Returned</option>
           </select>
           <select id="typeFilter" onchange="renderTable()">
             <option value="">All Types</option>
@@ -190,21 +193,61 @@
         <div class="form-section-title">🚚 Delivery Status</div>
         <div class="form-field-group">
           <label>Current Status *</label>
-          <select id="fStatus">
-            <option value="Booked">Booked</option>
-            <option value="In Transit">In Transit</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Pending">Pending</option>
-            <option value="Returned">Returned</option>
+          <select id="fStatus" onchange="handleStatusChange()">
+            <option value="Booked">📋 Booked</option>
+            <option value="In Transit">🚛 In Transit</option>
+            <option value="Out for Delivery">🏍️ Out for Delivery</option>
+            <option value="Delivered">✅ Delivered</option>
+            <option value="Pending">⏳ Pending</option>
+            <option value="Returned">↩️ Returned</option>
           </select>
         </div>
         <div class="form-field-group">
-          <label>Delivered Date</label>
-          <input type="date" id="fDeliveredDate">
+          <label>Status Updated On</label>
+          <input type="date" id="fStatusDate">
         </div>
-        <div class="form-field-group">
-          <label>Delivered To (Name)</label>
-          <input type="text" id="fDeliveredTo" placeholder="Person who received">
+
+        <!-- TRANSIT FIELDS — shown only when In Transit or Out for Delivery -->
+        <div id="transitFields" class="form-field-group full" style="display:none; grid-column:1/-1;">
+          <div style="background:#fff8e1; border:1.5px solid #f39c12; border-radius:10px; padding:1.25rem; margin-top:0.25rem;">
+            <div style="font-size:0.8rem; font-weight:700; color:#e67e22; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem;">📍 Transit Location Details</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div class="form-field-group" style="margin:0;">
+                <label>Current City / Location</label>
+                <input type="text" id="fTransitCity" placeholder="e.g. Ajmer, Jaipur, Delhi">
+              </div>
+              <div class="form-field-group" style="margin:0;">
+                <label>Transit Hub / Warehouse</label>
+                <input type="text" id="fTransitHub" placeholder="e.g. Jaipur Sorting Hub">
+              </div>
+              <div class="form-field-group" style="margin:0;">
+                <label>Arrived at Transit On</label>
+                <input type="datetime-local" id="fTransitArrived">
+              </div>
+              <div class="form-field-group" style="margin:0;">
+                <label>Expected Departure</label>
+                <input type="datetime-local" id="fTransitDeparture">
+              </div>
+              <div class="form-field-group full" style="margin:0; grid-column:1/-1;">
+                <label>Transit Remarks (shown to customer)</label>
+                <input type="text" id="fTransitRemark" placeholder="e.g. Parcel received at Jaipur hub, dispatched to Delhi">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DELIVERED FIELDS — shown only when Delivered -->
+        <div id="deliveredFields" style="display:none; grid-column:1/-1;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-field-group">
+              <label>Delivered Date</label>
+              <input type="date" id="fDeliveredDate">
+            </div>
+            <div class="form-field-group">
+              <label>Delivered To (Name)</label>
+              <input type="text" id="fDeliveredTo" placeholder="Person who received">
+            </div>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -240,7 +283,8 @@ function updateStats() {
   document.getElementById('sTotal').textContent = data.length;
   document.getElementById('sDelivered').textContent = data.filter(c => c.status === 'Delivered').length;
   document.getElementById('sTransit').textContent = data.filter(c => c.status === 'In Transit').length;
-  document.getElementById('sOther').textContent = data.filter(c => c.status !== 'Delivered' && c.status !== 'In Transit').length;
+  document.getElementById('sOut').textContent = data.filter(c => c.status === 'Out for Delivery').length;
+  document.getElementById('sOther').textContent = data.filter(c => !['Delivered','In Transit','Out for Delivery'].includes(c.status)).length;
 }
 
 function getFiltered() {
@@ -346,8 +390,15 @@ function openEdit(id) {
   document.getElementById('fConsigneeMobile').value = c.consigneeMobile || '';
   document.getElementById('fConsigneeAddress').value = c.consigneeAddress || '';
   document.getElementById('fStatus').value = c.status || 'Booked';
+  document.getElementById('fStatusDate').value = c.statusDate || '';
   document.getElementById('fDeliveredDate').value = c.deliveredDate || '';
   document.getElementById('fDeliveredTo').value = c.deliveredTo || '';
+  document.getElementById('fTransitCity').value = c.transitCity || '';
+  document.getElementById('fTransitHub').value = c.transitHub || '';
+  document.getElementById('fTransitArrived').value = c.transitArrived || '';
+  document.getElementById('fTransitDeparture').value = c.transitDeparture || '';
+  document.getElementById('fTransitRemark').value = c.transitRemark || '';
+  handleStatusChange();
 }
 
 function closeModal() {
@@ -356,12 +407,24 @@ function closeModal() {
 }
 
 function clearForm() {
-  ['fAwb','fTracking','fDate','fOrigin','fDestination','fWeight','fForwarder','fBranch','fConsignor','fConsignorMobile','fConsignee','fConsigneeMobile','fConsigneeAddress','fDeliveredDate','fDeliveredTo'].forEach(id => {
+  ['fAwb','fTracking','fDate','fOrigin','fDestination','fWeight','fForwarder','fBranch',
+   'fConsignor','fConsignorMobile','fConsignee','fConsigneeMobile','fConsigneeAddress',
+   'fDeliveredDate','fDeliveredTo','fTransitCity','fTransitHub','fTransitArrived',
+   'fTransitDeparture','fTransitRemark','fStatusDate'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('fType').value = 'Domestic';
   document.getElementById('fPayment').value = 'Prepaid';
   document.getElementById('fStatus').value = 'Booked';
+  handleStatusChange();
+}
+
+function handleStatusChange() {
+  const status = document.getElementById('fStatus').value;
+  const transitFields = document.getElementById('transitFields');
+  const deliveredFields = document.getElementById('deliveredFields');
+  transitFields.style.display = (status === 'In Transit' || status === 'Out for Delivery') ? 'block' : 'none';
+  deliveredFields.style.display = (status === 'Delivered') ? 'block' : 'none';
 }
 
 function saveConsignment() {
@@ -391,8 +454,14 @@ function saveConsignment() {
     consigneeMobile: document.getElementById('fConsigneeMobile').value.trim(),
     consigneeAddress: document.getElementById('fConsigneeAddress').value.trim(),
     status: document.getElementById('fStatus').value,
+    statusDate: document.getElementById('fStatusDate').value,
     deliveredDate: document.getElementById('fDeliveredDate').value,
     deliveredTo: document.getElementById('fDeliveredTo').value.trim(),
+    transitCity: document.getElementById('fTransitCity').value.trim(),
+    transitHub: document.getElementById('fTransitHub').value.trim(),
+    transitArrived: document.getElementById('fTransitArrived').value,
+    transitDeparture: document.getElementById('fTransitDeparture').value,
+    transitRemark: document.getElementById('fTransitRemark').value.trim(),
   };
 
   if (editingId) {

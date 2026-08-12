@@ -7,11 +7,10 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="slideshow.css">
 </head>
 <body>
 <div class="topbar"><div class="container topbar-inner"><div class="topbar-left"><span>📞 0291-2613165</span><span>📱 9314726460 / 9057576770</span><span>✉ info@vkexpress.in</span></div></div></div>
-<header class="site-header"><div class="container header-inner"><a href="index.html" class="logo-wrap"><img src="master_page_img/Logo.png" alt="VK Express Logo" class="logo-img"></a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button><nav class="main-nav" id="mainNav"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About Us</a><a href="services.html" class="nav-link">Services</a><a href="track.html" class="nav-link active">Track</a><a href="branches.html" class="nav-link">Branches</a><a href="contact.html" class="nav-link">Contact</a><a href="admin/index.html" class="nav-link nav-admin">LOGIN</a></nav></div></header>
+<header class="site-header"><div class="container header-inner"><a href="index.html" class="logo-wrap"><img src="images/lg.png" alt="VK Express Logo" class="logo-img"><div class="logo-text"><span class="logo-vk">V.K.</span><span class="logo-express">EXPRESS</span><span class="logo-tagline">Courier & Cargo</span></div></a><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button><nav class="main-nav" id="mainNav"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About Us</a><a href="services.html" class="nav-link">Services</a><a href="track.html" class="nav-link active">Track</a><a href="branches.html" class="nav-link">Branches</a><a href="contact.html" class="nav-link">Contact</a><a href="admin/index.html" class="nav-link nav-admin">Admin</a></nav></div></header>
 
 <section class="page-hero">
   <div class="container">
@@ -46,55 +45,218 @@
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="site-footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <img src="master_page_img/Logo.png" alt="VK Express" style="height:72px;width:auto;margin-bottom:0.5rem;">
-      <p>Courier &amp; Cargo Services<br>Jodhpur, Rajasthan, India</p>
-      <p style="margin-top:1rem; font-size:0.82rem; color:#666;">GST: 08AHGPK1597H1Z3</p>
-      <div class="footer-social">
-        <a href="#" class="social-btn fb">f</a>
-        <a href="#" class="social-btn tw">t</a>
-        <a href="#" class="social-btn gm">@</a>
-      </div>
-    </div>
-    <div class="footer-links">
-      <h5>Quick Links</h5>
-      <a href="index.html">Home</a>
-      <a href="about.html">About Us</a>
-      <a href="services.html">Services</a>
-      <a href="track.html">Track Shipment</a>
-      <a href="branches.html">Branches</a>
-      <a href="contact.html">Contact Us</a>
-    </div>
-    <div class="footer-links">
-      <h5>Services</h5>
-      <a href="services.html">International Courier</a>
-      <a href="services.html">Domestic Cargo</a>
-      <a href="services.html">Same Day Delivery</a>
-      <a href="services.html">Food Express</a>
-      <a href="services.html">Corporate Logistics</a>
-      <a href="services.html">Local Courier</a>
-    </div>
-    <div class="footer-contact">
-      <h5>Get In Touch</h5>
-      <p>114, Amer Chamber Jalori Gate<br>Olympic Road, Jodhpur<br>Rajasthan 342001, India</p>
-      <p style="margin-top:0.75rem;">📞 0291-2613165</p>
-      <p>📱 9314726460</p>
-      <p>✉ info@vkexpress.in</p>
-      <a href="track.html" class="footer-track-btn">Track Shipment →</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="container footer-bottom-inner">
-      <p>© 2025 V.K. Express Courier &amp; Cargo. All Rights Reserved.</p>
-      <p>Designed with ❤ in Jodhpur, Rajasthan</p>
-    </div>
-  </div>
+  <div class="footer-bottom"><div class="container"><p>© 2025 V.K. Express Courier & Cargo. All Rights Reserved.</p></div></div>
 </footer>
+
+<style>
+/* ── TRACKING TIMELINE ── */
+.track-timeline { margin-top: 1.5rem; }
+.track-timeline-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  color: var(--dark); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 1rem;
+}
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px; top: 0; bottom: 0;
+  width: 2px; background: #e0e0e0;
+}
+.tl-item {
+  position: relative;
+  padding: 0 0 1.4rem 1.25rem;
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot {
+  position: absolute;
+  left: -1.95rem; top: 3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #ddd;
+  background: #ccc;
+  z-index: 1;
+}
+.tl-dot.done     { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+.tl-dot.active   { background: #e67e22; box-shadow: 0 0 0 2px #e67e22; animation: pulse 1.5s infinite; }
+.tl-dot.pending  { background: #bbb;    box-shadow: 0 0 0 2px #bbb; }
+.tl-label {
+  font-weight: 700; font-size: 0.9rem;
+  color: var(--dark); margin-bottom: 0.2rem;
+}
+.tl-label.active-label { color: #e67e22; }
+.tl-label.pending-label { color: #aaa; }
+.tl-sub { font-size: 0.82rem; color: var(--text-light); line-height: 1.5; }
+.tl-time { font-size: 0.75rem; color: #bbb; margin-top: 0.2rem; }
+
+/* Transit city highlight box */
+.transit-city-box {
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border: 2px solid #f39c12;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0 0;
+  display: flex; align-items: center; gap: 1rem;
+}
+.tcb-icon { font-size: 2rem; flex-shrink: 0; }
+.tcb-text strong { display: block; font-size: 1rem; font-weight: 700; color: #b7770d; }
+.tcb-text span { font-size: 0.85rem; color: #888; }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 2px #e67e22; }
+  50%      { box-shadow: 0 0 0 6px rgba(230,126,34,0.25); }
+}
+</style>
 
 <script src="data.js"></script>
 <script src="main.js"></script>
+<script>
+// Override the full trackShipmentPage with enhanced version
+function trackShipmentPage() {
+  const input = document.getElementById('trackInputPage');
+  const resultBox = document.getElementById('trackResultPage');
+  if (!input || !resultBox) return;
+
+  const val = input.value.trim();
+  if (!val) { alert('Please enter a tracking number.'); return; }
+
+  const consignments = getConsignments();
+  const found = consignments.find(c =>
+    c.awb.toLowerCase() === val.toLowerCase() ||
+    c.trackingNo.toLowerCase() === val.toLowerCase()
+  );
+
+  resultBox.style.display = 'block';
+
+  if (!found) {
+    resultBox.className = 'track-result-box';
+    resultBox.innerHTML = `<h3>❌ Not Found</h3><p>No shipment found for <strong>${val}</strong>. Please verify the number or contact us at 0291-2613165.</p>`;
+    return;
+  }
+
+  // Status color/class mapping
+  const statusMap = {
+    'Booked':           { badge: 'status-booked',    label: '📋 Booked',           cls: '' },
+    'In Transit':       { badge: 'status-intransit',  label: '🚛 In Transit',        cls: 'intransit' },
+    'Out for Delivery': { badge: 'status-out',        label: '🏍️ Out for Delivery',  cls: 'intransit' },
+    'Delivered':        { badge: 'status-delivered',  label: '✅ Delivered',         cls: 'delivered' },
+    'Pending':          { badge: 'status-pending',    label: '⏳ Pending',           cls: '' },
+    'Returned':         { badge: 'status-returned',   label: '↩️ Returned',          cls: '' },
+  };
+  const sm = statusMap[found.status] || statusMap['Booked'];
+
+  // Build timeline steps
+  const steps = [
+    { key: 'Booked',           icon: '📋', label: 'Booked',           sub: `Shipment booked from ${found.origin}`, time: found.date },
+    { key: 'In Transit',       icon: '🚛', label: 'In Transit',        sub: null, time: null },
+    { key: 'Out for Delivery', icon: '🏍️', label: 'Out for Delivery',  sub: `Out for delivery in ${found.destination}`, time: null },
+    { key: 'Delivered',        icon: '✅', label: 'Delivered',         sub: found.deliveredTo ? `Received by ${found.deliveredTo}` : `Delivered at ${found.destination}`, time: found.deliveredDate },
+  ];
+
+  const statusOrder = ['Booked','In Transit','Out for Delivery','Delivered'];
+  const currentIdx  = statusOrder.indexOf(found.status);
+
+  let timelineHTML = '<div class="track-timeline"><div class="track-timeline-title">📍 Shipment Journey</div><div class="timeline">';
+
+  steps.forEach((step, i) => {
+    let dotClass = 'pending', labelClass = 'pending-label';
+    if (i < currentIdx) { dotClass = 'done'; labelClass = ''; }
+    else if (i === currentIdx) { dotClass = 'active'; labelClass = 'active-label'; }
+
+    // For In Transit step — inject city info
+    let extraHTML = '';
+    if (step.key === 'In Transit' && found.status === 'In Transit' && found.transitCity) {
+      extraHTML = `
+        <div class="transit-city-box">
+          <div class="tcb-icon">📍</div>
+          <div class="tcb-text">
+            <strong>Currently at: ${found.transitCity}</strong>
+            ${found.transitHub   ? `<span>Hub: ${found.transitHub}</span>` : ''}
+            ${found.transitArrived ? `<br><span>Arrived: ${formatDateTime(found.transitArrived)}</span>` : ''}
+            ${found.transitDeparture ? `<span> · Departing: ${formatDateTime(found.transitDeparture)}</span>` : ''}
+            ${found.transitRemark ? `<br><span style="color:#b7770d; font-weight:600;">${found.transitRemark}</span>` : ''}
+          </div>
+        </div>`;
+      step.sub = `Parcel in transit via ${found.forwarder || 'courier'}`;
+    }
+
+    const isSpecial = ['Returned','Pending'].includes(found.status) && i >= currentIdx && found.status !== 'Delivered';
+
+    timelineHTML += `
+      <div class="tl-item">
+        <div class="tl-dot ${isSpecial && i > 0 ? 'pending' : dotClass}">${i < currentIdx ? '✓' : (i === currentIdx ? '●' : '')}</div>
+        <div class="tl-label ${labelClass}">${step.icon} ${step.label}${i === currentIdx && found.status !== 'Delivered' ? ' <span style="background:#e67e22;color:#fff;font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:20px;font-weight:700;vertical-align:middle;">CURRENT</span>' : ''}</div>
+        ${step.sub ? `<div class="tl-sub">${step.sub}</div>` : ''}
+        ${step.time ? `<div class="tl-time">${step.time}</div>` : ''}
+        ${extraHTML}
+      </div>`;
+  });
+
+  // Special statuses
+  if (found.status === 'Returned') {
+    timelineHTML += `<div class="tl-item"><div class="tl-dot active">↩</div><div class="tl-label active-label">↩️ Returned <span style="background:#e74c3c;color:#fff;font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:20px;font-weight:700;vertical-align:middle;">CURRENT</span></div><div class="tl-sub">Shipment is being returned to origin.</div></div>`;
+  }
+  if (found.status === 'Pending') {
+    timelineHTML += `<div class="tl-item"><div class="tl-dot active">⏳</div><div class="tl-label active-label">⏳ Pending <span style="background:#888;color:#fff;font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:20px;font-weight:700;vertical-align:middle;">CURRENT</span></div><div class="tl-sub">Shipment is pending — please contact us for details.</div></div>`;
+  }
+
+  timelineHTML += '</div></div>';
+
+  // Style badge
+  const badgeStyles = {
+    'status-delivered':  'background:#d4edda;color:#155724;',
+    'status-intransit':  'background:#fff3cd;color:#856404;',
+    'status-out':        'background:#cce5ff;color:#004085;',
+    'status-booked':     'background:#e2e3e5;color:#383d41;',
+    'status-pending':    'background:#f8d7da;color:#721c24;',
+    'status-returned':   'background:#f8d7da;color:#721c24;',
+  };
+  const badgeStyle = badgeStyles[sm.badge] || '';
+
+  resultBox.className = `track-result-box ${sm.cls}`;
+  resultBox.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+      <div>
+        <h3 style="margin-bottom:0.25rem;">Shipment Details</h3>
+        <span style="${badgeStyle} display:inline-block; padding:0.3rem 0.9rem; border-radius:30px; font-size:0.82rem; font-weight:700; border-radius:20px;">${sm.label}</span>
+      </div>
+      <div style="text-align:right; font-size:0.8rem; color:var(--text-light);">
+        AWB: <strong>${found.awb}</strong><br>
+        ${found.trackingNo ? `Tracking: <strong>${found.trackingNo}</strong>` : ''}
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.5rem;">
+      <div class="track-detail-row"><span class="track-detail-label">Booking Date</span><span class="track-detail-val">${found.date}</span></div>
+      <div class="track-detail-row"><span class="track-detail-label">Service Type</span><span class="track-detail-val">${found.type}</span></div>
+      <div class="track-detail-row"><span class="track-detail-label">From</span><span class="track-detail-val">${found.origin}</span></div>
+      <div class="track-detail-row"><span class="track-detail-label">To</span><span class="track-detail-val">${found.destination}</span></div>
+      <div class="track-detail-row"><span class="track-detail-label">Consignee</span><span class="track-detail-val">${found.consignee || '—'}</span></div>
+      <div class="track-detail-row"><span class="track-detail-label">Forwarder</span><span class="track-detail-val">${found.forwarder || '—'}</span></div>
+      ${found.weight ? `<div class="track-detail-row"><span class="track-detail-label">Weight</span><span class="track-detail-val">${found.weight} kg</span></div>` : ''}
+      <div class="track-detail-row"><span class="track-detail-label">Payment Mode</span><span class="track-detail-val">${found.paymentMode}</span></div>
+    </div>
+
+    ${timelineHTML}
+
+    <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.82rem; color:var(--text-light); text-align:center;">
+      Need help? Call us: <a href="tel:02912613165" style="color:var(--red); font-weight:700;">0291-2613165</a> or <a href="tel:9314726460" style="color:var(--red); font-weight:700;">9314726460</a>
+    </div>
+  `;
+}
+
+function formatDateTime(dt) {
+  if (!dt) return '';
+  try {
+    const d = new Date(dt);
+    return d.toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  } catch(e) { return dt; }
+}
+</script>
 </body>
 </html>
