@@ -212,9 +212,18 @@
           <div style="background:#fff8e1; border:1.5px solid #f39c12; border-radius:10px; padding:1.25rem; margin-top:0.25rem;">
             <div style="font-size:0.8rem; font-weight:700; color:#e67e22; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem;">📍 Transit Location Details</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-              <div class="form-field-group" style="margin:0;">
+              <div class="form-field-group" style="margin:0; position:relative;">
                 <label>Current City / Location</label>
-                <input type="text" id="fTransitCity" placeholder="e.g. Ajmer, Jaipur, Delhi">
+                <input type="text" id="fTransitCity" placeholder="e.g. Ajmer, Jaipur, Delhi"
+                  autocomplete="off"
+                  oninput="showBranchSuggestions(this.value)"
+                  onblur="setTimeout(()=>hideSuggestions(),200)">
+                <div id="branchSuggestions" style="
+                  display:none; position:absolute; top:100%; left:0; right:0; z-index:999;
+                  background:#fff; border:1.5px solid #f39c12; border-top:none;
+                  border-radius:0 0 8px 8px; box-shadow:0 6px 20px rgba(0,0,0,0.12);
+                  max-height:200px; overflow-y:auto;
+                "></div>
               </div>
               <div class="form-field-group" style="margin:0;">
                 <label>Transit Hub / Warehouse</label>
@@ -480,6 +489,61 @@ function saveConsignment() {
   updateStats();
 }
 
+function showBranchSuggestions(val) {
+  const box = document.getElementById('branchSuggestions');
+  if (!box) return;
+
+  const branches = getBranches().filter(b => b.status === 1);
+
+  // Filter branches matching typed text (or show all if empty)
+  const query = val.trim().toLowerCase();
+  const matches = query
+    ? branches.filter(b => b.city.toLowerCase().includes(query))
+    : branches;
+
+  if (!matches.length) { box.style.display = 'none'; return; }
+
+  box.innerHTML = matches.map(b => `
+    <div onclick="selectBranch('${b.city.replace(/'/g,"\\'")}', ${b.id})"
+      style="padding:0.65rem 1rem; cursor:pointer; border-bottom:1px solid #fef3c7;
+             display:flex; align-items:center; gap:0.75rem; transition:background 0.15s;"
+      onmouseover="this.style.background='#fff8e1'"
+      onmouseout="this.style.background='#fff'">
+      <span style="font-size:1.1rem;">📍</span>
+      <div>
+        <div style="font-weight:700; font-size:0.88rem; color:#1a1a2e;">${b.city}</div>
+        <div style="font-size:0.75rem; color:#999; margin-top:0.1rem;">${b.address}</div>
+        <div style="font-size:0.75rem; color:#b7770d; margin-top:0.1rem;">📞 ${b.phone} &nbsp;|&nbsp; 📱 ${b.mobile}</div>
+      </div>
+    </div>
+  `).join('');
+
+  box.style.display = 'block';
+}
+
+function selectBranch(cityName, branchId) {
+  document.getElementById('fTransitCity').value = cityName;
+  // Also auto-fill hub name with branch city
+  const hub = document.getElementById('fTransitHub');
+  if (hub && !hub.value) hub.value = cityName + ' Branch';
+  hideSuggestions();
+}
+
+function hideSuggestions() {
+  const box = document.getElementById('branchSuggestions');
+  if (box) box.style.display = 'none';
+}
+
+// Show all branches when clicking into the field (if empty)
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('fTransitCity');
+  if (inp) {
+    inp.addEventListener('focus', function() {
+      showBranchSuggestions(this.value);
+    });
+  }
+});
+
 function delItem(id) {
   if (!confirm('Delete this consignment? This cannot be undone.')) return;
   saveConsignments(getConsignments().filter(c => c.id !== id));
@@ -487,6 +551,7 @@ function delItem(id) {
   updateStats();
   showToast('Consignment deleted.', 'error');
 }
+
 </script>
 </body>
 </html>

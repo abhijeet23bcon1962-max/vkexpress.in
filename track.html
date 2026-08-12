@@ -101,10 +101,11 @@
   border-radius: 10px;
   padding: 1rem 1.25rem;
   margin: 1rem 0 0;
-  display: flex; align-items: center; gap: 1rem;
+  display: flex; align-items: flex-start; gap: 1rem;
 }
-.tcb-icon { font-size: 2rem; flex-shrink: 0; }
-.tcb-text strong { display: block; font-size: 1rem; font-weight: 700; color: #b7770d; }
+.tcb-icon { font-size: 2rem; flex-shrink: 0; margin-top: 0.1rem; }
+.tcb-text { flex: 1; }
+.tcb-text strong { display: block; font-size: 1rem; font-weight: 700; color: #b7770d; margin-bottom: 0.2rem; }
 .tcb-text span { font-size: 0.85rem; color: #888; }
 
 @keyframes pulse {
@@ -168,21 +169,51 @@ function trackShipmentPage() {
     if (i < currentIdx) { dotClass = 'done'; labelClass = ''; }
     else if (i === currentIdx) { dotClass = 'active'; labelClass = 'active-label'; }
 
-    // For In Transit step — inject city info
+    // For In Transit / Out for Delivery step — inject city + branch info
     let extraHTML = '';
-    if (step.key === 'In Transit' && found.status === 'In Transit' && found.transitCity) {
-      extraHTML = `
-        <div class="transit-city-box">
-          <div class="tcb-icon">📍</div>
-          <div class="tcb-text">
-            <strong>Currently at: ${found.transitCity}</strong>
-            ${found.transitHub   ? `<span>Hub: ${found.transitHub}</span>` : ''}
-            ${found.transitArrived ? `<br><span>Arrived: ${formatDateTime(found.transitArrived)}</span>` : ''}
-            ${found.transitDeparture ? `<span> · Departing: ${formatDateTime(found.transitDeparture)}</span>` : ''}
-            ${found.transitRemark ? `<br><span style="color:#b7770d; font-weight:600;">${found.transitRemark}</span>` : ''}
-          </div>
-        </div>`;
-      step.sub = `Parcel in transit via ${found.forwarder || 'courier'}`;
+    if ((step.key === 'In Transit' && found.status === 'In Transit') ||
+        (step.key === 'Out for Delivery' && found.status === 'Out for Delivery')) {
+      if (found.transitCity) {
+
+        // Auto-fetch matching branch from branch data
+        const allBranches = getBranches();
+        const matchedBranch = allBranches.find(b =>
+          b.status === 1 &&
+          b.city.toLowerCase().includes(found.transitCity.toLowerCase()) ||
+          (found.transitCity.toLowerCase().includes(b.city.toLowerCase().replace(' (ho)','').replace(' (hq)','').trim()))
+        );
+
+        // Branch info card HTML
+        let branchCardHTML = '';
+        if (matchedBranch) {
+          branchCardHTML = `
+            <div style="margin-top:0.85rem; background:#fff; border:1.5px solid #f0c060; border-radius:8px; padding:0.85rem 1rem;">
+              <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#b7770d; margin-bottom:0.6rem;">🏢 Transit Branch Details</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1.5rem; font-size:0.84rem;">
+                <div><span style="color:#999; font-size:0.75rem; display:block;">Branch Name</span><strong>${matchedBranch.city}</strong></div>
+                <div><span style="color:#999; font-size:0.75rem; display:block;">Phone</span><a href="tel:${matchedBranch.phone}" style="color:#b7770d; font-weight:700;">${matchedBranch.phone}</a></div>
+                <div style="grid-column:1/-1;"><span style="color:#999; font-size:0.75rem; display:block;">Address</span>${matchedBranch.address}</div>
+                <div><span style="color:#999; font-size:0.75rem; display:block;">Mobile</span><a href="tel:${matchedBranch.mobile}" style="color:#b7770d; font-weight:700;">${matchedBranch.mobile}</a></div>
+                <div><span style="color:#999; font-size:0.75rem; display:block;">Email</span><a href="mailto:${matchedBranch.mail}" style="color:#b7770d;">${matchedBranch.mail}</a></div>
+              </div>
+            </div>`;
+        }
+
+        extraHTML = `
+          <div class="transit-city-box">
+            <div class="tcb-icon">📍</div>
+            <div class="tcb-text" style="flex:1;">
+              <strong>Currently at: ${found.transitCity}</strong>
+              ${found.transitHub ? `<span>Hub: ${found.transitHub}</span>` : ''}
+              ${found.transitArrived ? `<br><span>Arrived: ${formatDateTime(found.transitArrived)}</span>` : ''}
+              ${found.transitDeparture ? `<span> · Departing: ${formatDateTime(found.transitDeparture)}</span>` : ''}
+              ${found.transitRemark ? `<br><span style="color:#b7770d; font-weight:600;">${found.transitRemark}</span>` : ''}
+              ${branchCardHTML}
+            </div>
+          </div>`;
+
+        step.sub = `Parcel in transit via ${found.forwarder || 'courier'}`;
+      }
     }
 
     const isSpecial = ['Returned','Pending'].includes(found.status) && i >= currentIdx && found.status !== 'Delivered';
