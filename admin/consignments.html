@@ -45,12 +45,13 @@
   <div class="page-content">
 
     <!-- Stats Row -->
-    <div class="stat-cards" style="grid-template-columns: repeat(5,1fr); margin-bottom:1.5rem;">
+    <div class="stat-cards" style="grid-template-columns: repeat(6,1fr); margin-bottom:1.5rem;">
       <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-num" id="sTotal">0</div></div>
       <div class="stat-card" data-color="green"><div class="stat-card-label">Delivered</div><div class="stat-card-num" id="sDelivered">0</div></div>
       <div class="stat-card" data-color="yellow"><div class="stat-card-label">In Transit</div><div class="stat-card-num" id="sTransit">0</div></div>
       <div class="stat-card" data-color="blue"><div class="stat-card-label">Out for Delivery</div><div class="stat-card-num" id="sOut">0</div></div>
-      <div class="stat-card" data-color="purple"><div class="stat-card-label">Other</div><div class="stat-card-num" id="sOther">0</div></div>
+      <div class="stat-card" data-color="purple"><div class="stat-card-label">Undelivered</div><div class="stat-card-num" id="sUndelivered">0</div></div>
+      <div class="stat-card"><div class="stat-card-label">Other</div><div class="stat-card-num" id="sOther">0</div></div>
     </div>
 
     <div class="content-card">
@@ -67,6 +68,7 @@
             <option value="In Transit">🚛 In Transit</option>
             <option value="Out for Delivery">🏍️ Out for Delivery</option>
             <option value="Delivered">✅ Delivered</option>
+            <option value="Undelivered">❌ Undelivered</option>
             <option value="Pending">⏳ Pending</option>
             <option value="Returned">↩️ Returned</option>
           </select>
@@ -198,6 +200,7 @@
             <option value="In Transit">🚛 In Transit</option>
             <option value="Out for Delivery">🏍️ Out for Delivery</option>
             <option value="Delivered">✅ Delivered</option>
+            <option value="Undelivered">❌ Undelivered</option>
             <option value="Pending">⏳ Pending</option>
             <option value="Returned">↩️ Returned</option>
           </select>
@@ -259,6 +262,57 @@
           </div>
         </div>
 
+        <!-- UNDELIVERED FIELDS — shown only when Undelivered -->
+        <div id="undeliveredFields" style="display:none; grid-column:1/-1;">
+          <div style="background:#fdf2f2; border:1.5px solid #e74c3c; border-radius:10px; padding:1.25rem; margin-top:0.25rem;">
+            <div style="font-size:0.8rem; font-weight:700; color:#c0392b; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem;">❌ Undelivered Reason Details</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div class="form-field-group" style="margin:0; grid-column:1/-1;">
+                <label>Reason for Non-Delivery *</label>
+                <select id="fUndeliveredReason" onchange="handleUndeliveredReason()">
+                  <option value="">-- Select Reason --</option>
+                  <option value="Address Shifted">🏠 Address Shifted / Wrong Address</option>
+                  <option value="Refused Delivery">🚫 Refused to Take Delivery</option>
+                  <option value="Not Available">🔔 Consignee Not Available</option>
+                  <option value="Office Closed">🔒 Office / Shop Closed</option>
+                  <option value="Incomplete Address">📍 Incomplete Address</option>
+                  <option value="Other">📝 Other Reason</option>
+                </select>
+              </div>
+              <!-- Address Shifted sub-fields -->
+              <div id="addressShiftedFields" style="display:none; grid-column:1/-1;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                  <div class="form-field-group" style="margin:0; grid-column:1/-1;">
+                    <label>New / Correct Address (if known)</label>
+                    <input type="text" id="fNewAddress" placeholder="Enter new address provided by consignee">
+                  </div>
+                </div>
+              </div>
+              <!-- Refused sub-fields -->
+              <div id="refusedFields" style="display:none; grid-column:1/-1;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                  <div class="form-field-group" style="margin:0; grid-column:1/-1;">
+                    <label>Reason for Refusal</label>
+                    <input type="text" id="fRefusalReason" placeholder="e.g. Damaged parcel, Not ordered, Price dispute">
+                  </div>
+                </div>
+              </div>
+              <div class="form-field-group" style="margin:0;">
+                <label>Attempted Delivery Date</label>
+                <input type="date" id="fUndeliveredDate">
+              </div>
+              <div class="form-field-group" style="margin:0;">
+                <label>Delivery Attempted By</label>
+                <input type="text" id="fUndeliveredBy" placeholder="Delivery person name">
+              </div>
+              <div class="form-field-group full" style="margin:0; grid-column:1/-1;">
+                <label>Additional Remarks (shown to customer)</label>
+                <input type="text" id="fUndeliveredRemark" placeholder="e.g. Will reattempt delivery tomorrow">
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="form-actions">
           <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
           <button class="btn btn-primary" onclick="saveConsignment()">💾 Save Consignment</button>
@@ -293,7 +347,8 @@ function updateStats() {
   document.getElementById('sDelivered').textContent = data.filter(c => c.status === 'Delivered').length;
   document.getElementById('sTransit').textContent = data.filter(c => c.status === 'In Transit').length;
   document.getElementById('sOut').textContent = data.filter(c => c.status === 'Out for Delivery').length;
-  document.getElementById('sOther').textContent = data.filter(c => !['Delivered','In Transit','Out for Delivery'].includes(c.status)).length;
+  document.getElementById('sOther').textContent = data.filter(c => !['Delivered','In Transit','Out for Delivery','Undelivered'].includes(c.status)).length;
+  if(document.getElementById('sUndelivered')) document.getElementById('sUndelivered').textContent = data.filter(c => c.status === 'Undelivered').length;
 }
 
 function getFiltered() {
@@ -407,7 +462,14 @@ function openEdit(id) {
   document.getElementById('fTransitArrived').value = c.transitArrived || '';
   document.getElementById('fTransitDeparture').value = c.transitDeparture || '';
   document.getElementById('fTransitRemark').value = c.transitRemark || '';
+  document.getElementById('fUndeliveredReason').value = c.undeliveredReason || '';
+  document.getElementById('fNewAddress').value = c.newAddress || '';
+  document.getElementById('fRefusalReason').value = c.refusalReason || '';
+  document.getElementById('fUndeliveredDate').value = c.undeliveredDate || '';
+  document.getElementById('fUndeliveredBy').value = c.undeliveredBy || '';
+  document.getElementById('fUndeliveredRemark').value = c.undeliveredRemark || '';
   handleStatusChange();
+  handleUndeliveredReason();
 }
 
 function closeModal() {
@@ -419,21 +481,31 @@ function clearForm() {
   ['fAwb','fTracking','fDate','fOrigin','fDestination','fWeight','fForwarder','fBranch',
    'fConsignor','fConsignorMobile','fConsignee','fConsigneeMobile','fConsigneeAddress',
    'fDeliveredDate','fDeliveredTo','fTransitCity','fTransitHub','fTransitArrived',
-   'fTransitDeparture','fTransitRemark','fStatusDate'].forEach(id => {
+   'fTransitDeparture','fTransitRemark','fStatusDate',
+   'fNewAddress','fRefusalReason','fUndeliveredDate','fUndeliveredBy','fUndeliveredRemark'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('fType').value = 'Domestic';
   document.getElementById('fPayment').value = 'Prepaid';
   document.getElementById('fStatus').value = 'Booked';
+  document.getElementById('fUndeliveredReason').value = '';
   handleStatusChange();
 }
 
 function handleStatusChange() {
   const status = document.getElementById('fStatus').value;
-  const transitFields = document.getElementById('transitFields');
-  const deliveredFields = document.getElementById('deliveredFields');
-  transitFields.style.display = (status === 'In Transit' || status === 'Out for Delivery') ? 'block' : 'none';
-  deliveredFields.style.display = (status === 'Delivered') ? 'block' : 'none';
+  const transitFields    = document.getElementById('transitFields');
+  const deliveredFields  = document.getElementById('deliveredFields');
+  const undeliveredFields= document.getElementById('undeliveredFields');
+  transitFields.style.display     = (status === 'In Transit' || status === 'Out for Delivery') ? 'block' : 'none';
+  deliveredFields.style.display   = (status === 'Delivered')   ? 'block' : 'none';
+  undeliveredFields.style.display = (status === 'Undelivered') ? 'block' : 'none';
+}
+
+function handleUndeliveredReason() {
+  const reason = document.getElementById('fUndeliveredReason').value;
+  document.getElementById('addressShiftedFields').style.display = (reason === 'Address Shifted') ? 'block' : 'none';
+  document.getElementById('refusedFields').style.display        = (reason === 'Refused Delivery') ? 'block' : 'none';
 }
 
 function saveConsignment() {
@@ -471,6 +543,12 @@ function saveConsignment() {
     transitArrived: document.getElementById('fTransitArrived').value,
     transitDeparture: document.getElementById('fTransitDeparture').value,
     transitRemark: document.getElementById('fTransitRemark').value.trim(),
+    undeliveredReason: document.getElementById('fUndeliveredReason').value,
+    newAddress: document.getElementById('fNewAddress').value.trim(),
+    refusalReason: document.getElementById('fRefusalReason').value.trim(),
+    undeliveredDate: document.getElementById('fUndeliveredDate').value,
+    undeliveredBy: document.getElementById('fUndeliveredBy').value.trim(),
+    undeliveredRemark: document.getElementById('fUndeliveredRemark').value.trim(),
   };
 
   if (editingId) {

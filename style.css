@@ -93,11 +93,10 @@ img { max-width: 100%; display: block; }
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  
 }
 .logo-img {
-  height: 70px;
-  width: 150px;
+  height: 60px;
+  width: 60px;
   object-fit: contain;
   border-radius: 8px;
 }
@@ -484,8 +483,8 @@ img { max-width: 100%; display: block; }
 }
 .franchise-inner {
   display: flex;
-  justify-content: center;
-  align-items: center;  
+  justify-content: space-between;
+  align-items: center;
   gap: 2rem;
 }
 .franchise-text h3 {
@@ -728,9 +727,13 @@ img { max-width: 100%; display: block; }
   font-size: 0.8rem;
   font-weight: 700;
 }
-.status-delivered { background: #d4edda; color: #155724; }
-.status-intransit { background: #fff3cd; color: #856404; }
-.status-pending { background: #f8d7da; color: #721c24; }
+.status-delivered  { background: #d4edda; color: #155724; }
+.status-intransit  { background: #fff3cd; color: #856404; }
+.status-out        { background: #cce5ff; color: #004085; }
+.status-booked     { background: #e2e3e5; color: #383d41; }
+.status-pending    { background: #f8d7da; color: #721c24; }
+.status-returned    { background: #f8d7da; color: #721c24; }
+.status-undelivered { background: #f8d7da; color: #c0392b; border: 1.5px solid #e74c3c; }
 
 /* ---- CONTACT PAGE ---- */
 .contact-grid {

@@ -148,6 +148,7 @@ function trackShipmentPage() {
     'Delivered':        { badge: 'status-delivered',  label: '✅ Delivered',         cls: 'delivered' },
     'Pending':          { badge: 'status-pending',    label: '⏳ Pending',           cls: '' },
     'Returned':         { badge: 'status-returned',   label: '↩️ Returned',          cls: '' },
+    'Undelivered':      { badge: 'status-undelivered', label: '❌ Undelivered',        cls: 'undelivered' },
   };
   const sm = statusMap[found.status] || statusMap['Booked'];
 
@@ -234,6 +235,51 @@ function trackShipmentPage() {
   }
   if (found.status === 'Pending') {
     timelineHTML += `<div class="tl-item"><div class="tl-dot active">⏳</div><div class="tl-label active-label">⏳ Pending <span style="background:#888;color:#fff;font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:20px;font-weight:700;vertical-align:middle;">CURRENT</span></div><div class="tl-sub">Shipment is pending — please contact us for details.</div></div>`;
+  }
+  if (found.status === 'Undelivered') {
+    const reasonLabels = {
+      'Address Shifted':   '🏠 Address Shifted / Wrong Address',
+      'Refused Delivery':  '🚫 Consignee Refused to Accept Delivery',
+      'Not Available':     '🔔 Consignee Was Not Available',
+      'Office Closed':     '🔒 Office / Shop Found Closed',
+      'Incomplete Address':'📍 Address Was Incomplete',
+      'Other':             '📝 Other Reason',
+    };
+    const reasonLabel = found.undeliveredReason ? (reasonLabels[found.undeliveredReason] || found.undeliveredReason) : 'Delivery Attempted';
+
+    let undeliveredExtra = '';
+    if (found.undeliveredReason === 'Address Shifted' && found.newAddress) {
+      undeliveredExtra = `<div style="margin-top:0.5rem; background:#fff3e0; border:1px solid #f39c12; border-radius:6px; padding:0.6rem 0.85rem; font-size:0.84rem;">
+        <strong style="color:#b7770d;">📍 New Address Provided:</strong><br>${found.newAddress}
+      </div>`;
+    }
+    if (found.undeliveredReason === 'Refused Delivery' && found.refusalReason) {
+      undeliveredExtra = `<div style="margin-top:0.5rem; background:#fdf2f2; border:1px solid #e74c3c; border-radius:6px; padding:0.6rem 0.85rem; font-size:0.84rem;">
+        <strong style="color:#c0392b;">Reason for Refusal:</strong> ${found.refusalReason}
+      </div>`;
+    }
+
+    timelineHTML += `
+      <div class="tl-item">
+        <div class="tl-dot active" style="background:#e74c3c; box-shadow:0 0 0 2px #e74c3c;">✕</div>
+        <div class="tl-label active-label" style="color:#e74c3c;">❌ Undelivered
+          <span style="background:#e74c3c;color:#fff;font-size:0.65rem;padding:0.1rem 0.5rem;border-radius:20px;font-weight:700;vertical-align:middle;">CURRENT</span>
+        </div>
+        <div class="tl-sub">${reasonLabel}</div>
+        ${found.undeliveredDate ? `<div class="tl-time">Attempted: ${found.undeliveredDate}${found.undeliveredBy ? ' by ' + found.undeliveredBy : ''}</div>` : ''}
+        ${undeliveredExtra}
+        ${found.undeliveredRemark ? `<div style="margin-top:0.5rem; font-size:0.83rem; color:#e67e22; font-weight:600;">ℹ️ ${found.undeliveredRemark}</div>` : ''}
+        <div style="margin-top:0.75rem; background:#fdf2f2; border:1.5px solid #e74c3c; border-radius:8px; padding:0.85rem 1rem; font-size:0.84rem;">
+          <strong style="color:#c0392b;">What happens next?</strong><br>
+          ${found.undeliveredReason === 'Address Shifted'
+            ? 'Please contact us with your correct address so we can redeliver your parcel.'
+            : found.undeliveredReason === 'Refused Delivery'
+            ? 'The parcel will be returned to the sender. Please contact us if this is a mistake.'
+            : 'Please contact our office to reschedule delivery or collect your parcel from our branch.'
+          }<br>
+          <strong style="color:#c0392b;">📞 0291-2613165 &nbsp;|&nbsp; 📱 9314726460</strong>
+        </div>
+      </div>`;
   }
 
   timelineHTML += '</div></div>';
